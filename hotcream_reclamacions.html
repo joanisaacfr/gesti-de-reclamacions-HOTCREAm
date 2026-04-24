@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama de Flux - Gestió de Reclamacions HotCream Häagen-Dazs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #faf6f1 0%, #f0e6d8 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #2c1810;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 35px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(44,24,16,0.1);
+            border-top: 5px solid #8b0000;
+        }
+        
+        .header-icon {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+        
+        h1 {
+            font-size: 2.4em;
+            color: #8b0000;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            color: #6b4423;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        .product-badge {
+            display: inline-block;
+            background: #8b0000;
+            color: #fff;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-top: 20px;
+            letter-spacing: 1px;
+        }
+        
+        /* Timeline container */
+        .timeline-wrapper {
+            position: relative;
+            padding-left: 60px;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            left: 25px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #8b0000, #d4a574, #8b0000);
+            border-radius: 2px;
+        }
+        
+        /* Phase sections */
+        .phase {
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .phase-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .phase-dot {
+            position: absolute;
+            left: -47px;
+            width: 30px;
+            height: 30px;
+            background: #8b0000;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            box-shadow: 0 0 0 4px #8b0000;
+            z-index: 2;
+        }
+        
+        .phase-dot.green { background: #2e7d32; box-shadow: 0 0 0 4px #2e7d32; }
+        .phase-dot.orange { background: #e65100; box-shadow: 0 0 0 4px #e65100; }
+        .phase-dot.blue { background: #1565c0; box-shadow: 0 0 0 4px #1565c0; }
+        .phase-dot.purple { background: #6a1b9a; box-shadow: 0 0 0 4px #6a1b9a; }
+        .phase-dot.red { background: #c62828; box-shadow: 0 0 0 4px #c62828; }
+        
+        .phase-label {
+            background: #8b0000;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1em;
+            letter-spacing: 0.5px;
+        }
+        
+        .phase-label.green { background: #2e7d32; }
+        .phase-label.orange { background: #e65100; }
+        .phase-label.blue { background: #1565c0; }
+        .phase-label.purple { background: #6a1b9a; }
+        .phase-label.red { background: #c62828; }
+        
+        .phase-time {
+            margin-left: 15px;
+            background: rgba(139,0,0,0.1);
+            color: #8b0000;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9em;
+        }
+        
+        /* Step cards */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-left: 20px;
+        }
+        
+        .step-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(44,24,16,0.08);
+            border-left: 5px solid #8b0000;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .step-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 35px rgba(44,24,16,0.15);
+        }
+        
+        .step-card.green { border-left-color: #2e7d32; }
+        .step-card.orange { border-left-color: #e65100; }
+        .step-card.blue { border-left-color: #1565c0; }
+        .step-card.purple { border-left-color: #6a1b9a; }
+        .step-card.red { border-left-color: #c62828; }
+        
+        .step-number {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: #8b0000;
+            color: #fff;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.95em;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .step-card.green .step-number { background: #2e7d32; }
+        .step-card.orange .step-number { background: #e65100; }
+        .step-card.blue .step-number { background: #1565c0; }
+        .step-card.purple .step-number { background: #6a1b9a; }
+        .step-card.red .step-number { background: #c62828; }
+        
+        .step-title {
+            font-size: 1.15em;
+            font-weight: 700;
+            color: #2c1810;
+            margin-bottom: 12px;
+            padding-right: 40px;
+        }
+        
+        .step-desc {
+            font-size: 0.95em;
+            color: #5a4a3a;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .step-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .meta-tag {
+            background: #f5f0e8;
+            color: #6b4423;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .meta-tag.urgent {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .meta-tag.system {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        /* Decision diamonds */
+        .decision-box {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border: 3px solid #e65100;
+            border-radius: 16px;
+            padding: 25px;
+            margin: 30px 20px;
+            position: relative;
+            text-align: center;
+        }
+        
+        .decision-box::before {
+            content: '◆';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #e65100;
+            color: #fff;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+        
+        .decision-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #e65100;
+            margin-bottom: 15px;
+            margin-top: 10px;
+        }
+        
+        .decision-branches {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .branch {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .branch.yes { border-color: #2e7d32; }
+        .branch.no { border-color: #c62828; }
+        
+        .branch-label {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .branch.yes .branch-label { color: #2e7d32; }
+        .branch.no .branch-label { color: #c62828; }
+        
+        .branch-desc {
+            font-size: 0.9em;
+            color: #5a4a3a;
+        }
+        
+        /* Arrow connectors */
+        .arrow-down {
+            text-align: center;
+            font-size: 2em;
+            color: #8b0000;
+            margin: 15px 0;
+            opacity: 0.6;
+        }
+        
+        /* Resolution outcomes */
+        .outcome-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 20px;
+        }
+        
+        .outcome-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(44,24,16,0.08);
+            border-top: 5px solid;
+        }
+        
+        .outcome-card.success { border-top-color: #2e7d32; }
+        .outcome-card.warning { border-top-color: #e65100; }
+        .outcome-card.danger { border-top-color: #c62828; }
+        
+        .outcome-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .outcome-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .outcome-card.success .outcome-title { color: #2e7d32; }
+        .outcome-card.warning .outcome-title { color: #e65100; }
+        .outcome-card.danger .outcome-title { color: #c62828; }
+        
+        .outcome-desc {
+            font-size: 0.9em;
+            color: #5a4a3a;
+            line-height: 1.5;
+        }
+        
+        /* Metrics bar */
+        .metrics-bar {
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 40px 20px;
+            box-shadow: 0 5px 20px rgba(44,24,16,0.08);
+            border: 2px solid #e8ddd0;
+        }
+        
+        .metrics-title {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #8b0000;
+            margin-bottom: 25px;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .metric-item {
+            text-align: center;
+            padding: 20px;
+            background: #faf6f1;
+            border-radius: 12px;
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #8b0000;
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            color: #6b4423;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        
+        /* Legend */
+        .legend-section {
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 50px;
+            box-shadow: 0 5px 20px rgba(44,24,16,0.08);
+            border: 2px solid #e8ddd0;
+        }
+        
+        .legend-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #8b0000;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #faf6f1;
+            border-radius: 10px;
+        }
+        
+        .legend-color {
+            width: 25px;
+            height: 25px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .timeline-wrapper {
+                padding-left: 40px;
+            }
+            
+            .phase-dot {
+                left: -32px;
+                width: 24px;
+                height: 24px;
+            }
+            
+            h1 {
+                font-size: 1.6em;
+            }
+            
+            .steps-grid {
+                grid-template-columns: 1fr;
+                margin-left: 0;
+            }
+            
+            .decision-branches {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">🔄</div>
+            <h1>Diagrama de Flux de Gestió de Reclamacions</h1>
+            <div class="subtitle">Procediment complet per a resolució d'incidències · HotCream Häagen-Dazs</div>
+            <div class="product-badge">PROTOCOL ESTÀNDARD</div>
+        </div>
+        
+        <div class="timeline-wrapper">
+            <div class="timeline-line"></div>
+            
+            <!-- FASE 1: RECEPCIÓ -->
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-dot green"></div>
+                    <div class="phase-label green">FASE 1: RECEPCIÓ</div>
+                    <div class="phase-time">⏱️ 0-2 hores</div>
+                </div>
+                
+                <div class="steps-grid">
+                    <div class="step-card green">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Recepció del contacte</div>
+                        <div class="step-desc">
+                            El client contacta per qualsevol canal (telèfon, email, chat, xarxes, presencial). S'obre automàticament un ticket al CRM amb data/hora, canal i identificació del client.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag">📞 Telèfon</span>
+                            <span class="meta-tag">💬 Chat</span>
+                            <span class="meta-tag">📧 Email</span>
+                            <span class="meta-tag">📱 Xarxes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-card green">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Registre de la reclamació</div>
+                        <div class="step-desc">
+                            L'agent documenta: tipologia de reclamació, producte afectat (HotCream), número de lot, data de compra, descripció detallada del problema i documentació adjunta (fotos, tiquet).
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag system">🖥️ CRM HotCream</span>
+                            <span class="meta-tag">📎 Adjunts</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-card green">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Classificació inicial</div>
+                        <div class="step-desc">
+                            Es categoritza per tipologia i nivell de gravetat per a assignació correcta i temps de resposta adequat.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag urgent">🔴 Crític: Seguretat alimentària</span>
+                            <span class="meta-tag">🟠 Alt: Producte defectuós</span>
+                            <span class="meta-tag">🟡 Mig: Servei deficient</span>
+                            <span class="meta-tag">🟢 Baix: Consulta/dubte</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arrow-down">⬇</div>
+            
+            <!-- FASE 2: ANÀLISI I VALIDACIÓ -->
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-dot orange"></div>
+                    <div class="phase-label orange">FASE 2: ANÀLISI I VALIDACIÓ</div>
+                    <div class="phase-time">⏱️ 2-24 hores</div>
+                </div>
+                
+                <div class="steps-grid">
+                    <div class="step-card orange">
+                        <div class="step-number">4</div>
+                        <div class="step-title">Assignació al tècnic competent</div>
+                        <div class="step-desc">
+                            Segons la tipologia, el ticket es deriva a l'equip especialitzat: agents generals (nivell 1), suport tècnic digital, logística, qualitat o compensacions.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag">👤 Agent Nivell 1</span>
+                            <span class="meta-tag">🔬 Qualitat</span>
+                            <span class="meta-tag">📦 Logística</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-card orange">
+                        <div class="step-number">5</div>
+                        <div class="step-title">Investigació i recopilació d'evidències</div>
+                        <div class="step-desc">
+                            Es verifiquen dades internes: traçabilitat del lot, registres d'enviament (cold chain), històric del client, compres prèvies i possibles incidències similars reportades.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag system">📊 ERP</span>
+                            <span class="meta-tag system">🌡️ Sensors cold chain</span>
+                            <span class="meta-tag">📋 Històric client</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-card orange">
+                        <div class="step-number">6</div>
+                        <div class="step-title">Validació de la reclamació</div>
+                        <div class="step-desc">
+                            Es determina si la reclamació és procedent segons garantia, política de devolucions i condicions de conservació del producte.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag">✅ Procedent</span>
+                            <span class="meta-tag">❌ Improcedent</span>
+                            <span class="meta-tag">❓ Requereix més info</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PUNT DE DECISIÓ 1 -->
+            <div class="decision-box">
+                <div class="decision-title">¿La reclamació és procedent?</div>
+                <div class="decision-desc">Validació jurídica i tècnica de la base de la reclamació</div>
+                <div class="decision-branches">
+                    <div class="branch yes">
+                        <div class="branch-label">✅ SÍ PROCEDEIX</div>
+                        <div class="branch-desc">Continua a Fase 3: Proposta de resolució</div>
+                    </div>
+                    <div class="branch no">
+                        <div class="branch-label">❌ NO PROCEDEIX</div>
+                        <div class="branch-desc">Salta a Fase 5: Tancament amb resposta negativa</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FASE 3: PROPOSTA DE RESOLUCIÓ -->
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-dot blue"></div>
+                    <div class="phase-label blue">FASE 3: PROPOSTA DE RESOLUCIÓ</div>
+                    <div class="phase-time">⏱️ 24-48 hores</div>
+                </div>
+                
+                <div class="steps-grid">
+                    <div class="step-card blue">
+                        <div class="step-number">7</div>
+                        <div class="step-title">Definició de la solució</div>
+                        <div class="step-desc">
+                            Es determina la compensació més adequada segons gravetat, històric del client i política de goodwill. Opcions: reemborsament, substitució, bon de descompte, enviament exprés gratuït o gest de bona voluntat.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag">💰 Reemborsament</span>
+                            <span class="meta-tag">🔄 Substitució</span>
+                            <span class="meta-tag">🎟️ Bon descompte</span>
+                            <span class="meta-tag">🚚 Enviam. exprés</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-card blue">
+                        <div class="step-number">8</div>
+                        <div class="step-title">Aprovació segons nivell de compensació</div>
+                        <div class="step-desc">
+                            Compensacions estàndard: l'agent aplica directament. Imports elevats o casos complexes requereixen validació del supervisor o Cap de Postvenda.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag">&lt;50€: Agent</span>
+                            <span class="meta-tag">50-200€: Supervisor</span>
+                            <span class="meta-tag">&gt;200€: Cap Postvenda</span>
+                            <span class="meta-tag urgent">Seguretat: Direcció</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-card blue">
+                        <div class="step-number">9</div>
+                        <div class="step-title">Comunicació de la proposta al client</div>
+                        <div class="step-desc">
+                            Es contacta el client explicant la resolució, disculpant-se per la molèstia i detallant els passos següents. S'utilitza to empàtic i proactiu, coherent amb la marca premium.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag">📧 Email formal</span>
+                            <span class="meta-tag">📞 Trucada personal</span>
+                            <span class="meta-tag">💬 Chat seguiment</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PUNT DE DECISIÓ 2 -->
+            <div class="decision-box">
+                <div class="decision-title">¿El client accepta la proposta?</div>
+                <div class="decision-desc">Espera de resposta del client amb un termini màxim de 5 dies hàbils</div>
+                <div class="decision-branches">
+                    <div class="branch yes">
+                        <div class="branch-label">✅ ACCEPTA</div>
+                        <div class="branch-desc">Continua a Fase 4: Execució i tancament</div>
+                    </div>
+                    <div class="branch no">
+                        <div class="branch-label">❌ RECHAZA / NO RESPON</div>
+                        <div class="branch-desc">Escalació a Fase 5: Negociació o tancament</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FASE 4: EXECUCIÓ I TANCAMENT -->
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-dot purple"></div>
+                    <div class="phase-label purple">FASE 4: EXECUCIÓ I TANCAMENT</div>
+                    <div class="phase-time">⏱️ 48-72 hores</div>
+                </div>
+                
+                <div class="steps-grid">
+                    <div class="step-card purple">
+                        <div class="step-number">10</div>
+                        <div class="step-title">Execució de la compensació</div>
+                        <div class="step-desc">
+                            Es processa el reemborsament (3-5 dies bancaris), s'envia el producte substitutiu, s'emet el bon de descompte o es programa l'enviament exprés. Es notifica al client amb número de seguiment.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag system">💳 Passarel·la pagaments</span>
+                            <span class="meta-tag system">📦 Sistema logístic</span>
+                            <span class="meta-tag">🔢 Nº seguiment</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-card purple">
+                        <div class="step-number">11</div>
+                        <div class="step-title">Verificació de recepció / satisfacció</div>
+                        <div class="step-desc">
+                            Es contacta el client per confirmar que ha rebut la compensació i està satisfet amb la resolució. Es resolen dubtes finals.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag">📞 Follow-up</span>
+                            <span class="meta-tag">📧 Email confirmació</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-card purple">
+                        <div class="step-number">12</div>
+                        <div class="step-title">Tancament del cas i enquesta</div>
+                        <div class="step-desc">
+                            Es tanca el ticket al CRM amb resolució detallada. S'envia enquesta CSAT/NPS per mesurar satisfacció amb la gestió de la reclamació. Es classifica per anàlisi de tendències.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag system">🔒 Tancament CRM</span>
+                            <span class="meta-tag">⭐ Enquesta CSAT</span>
+                            <span class="meta-tag">📊 Codi tipologia</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arrow-down">⬇</div>
+            
+            <!-- RESULTATS -->
+            <div class="outcome-grid">
+                <div class="outcome-card success">
+                    <div class="outcome-icon">😊</div>
+                    <div class="outcome-title">CLIENT SATISFET</div>
+                    <div class="outcome-desc">
+                        Fidelització reforçada. El client percep que la marca premium compleix la seva promesa fins i tot en situacions negatives. Probable recomanador.
+                    </div>
+                </div>
+                <div class="outcome-card warning">
+                    <div class="outcome-icon">😐</div>
+                    <div class="outcome-title">CLIENT NEUTRE</div>
+                    <div class="outcome-desc">
+                        Resolució acceptable però sense sorpresa positiva. Oportunitat de millora en la proposta de compensació o comunicació.
+                    </div>
+                </div>
+                <div class="outcome-card danger">
+                    <div class="outcome-icon">😠</div>
+                    <div class="outcome-title">CLIENT INSATISFET</div>
+                    <div class="outcome-desc">
+                        Escalació a supervisor o Cap de Postvenda. Possible derivació a mediació externa (OMIC) o via legal. Activació de protocol de retenció.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FASE 5: ESCALACIÓ I TANCAMENT ALTERNATIU -->
+            <div class="phase">
+                <div class="phase-header">
+                    <div class="phase-dot red"></div>
+                    <div class="phase-label red">FASE 5: ESCALACIÓ / TANCAMENT ALTERNATIU</div>
+                    <div class="phase-time">⏱️ Variable</div>
+                </div>
+                
+                <div class="steps-grid">
+                    <div class="step-card red">
+                        <div class="step-number">A</div>
+                        <div class="step-title">Reclamació improcedent: resposta motivada</div>
+                        <div class="step-desc">
+                            Es comunica al client de forma respectuosa i documentada per què la reclamació no procedeix, citant condicions de compra, política de garanties o evidències tècniques. S'ofereix alternativa de goodwill si escau.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag">📋 Resposta motivada</span>
+                            <span class="meta-tag">⚖️ Base legal</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-card red">
+                        <div class="step-number">B</div>
+                        <div class="step-title">Client rebutja proposta: renegociació</div>
+                        <div class="step-desc">
+                            El supervisor o Cap de Postvenda contacta directament el client per entendre motius del rebuig i explorar alternatives. Es pot oferir compensació superior dins de límits autoritzats.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag">🤝 Negociació directa</span>
+                            <span class="meta-tag">💡 Alternatives</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step-card red">
+                        <div class="step-number">C</div>
+                        <div class="step-title">Mediació externa o via legal</div>
+                        <div class="step-desc">
+                            Si no hi ha acord, s'informa al client de la possibilitat de recórrer a OMIC, consum de la Generalitat o via judicial. L'empresa participa de bona fe en mediacions.
+                        </div>
+                        <div class="step-meta">
+                            <span class="meta-tag">🏛️ OMIC</span>
+                            <span class="meta-tag">⚖️ Via legal</span>
+                            <span class="meta-tag">📄 Documentació</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Metrics -->
+        <div class="metrics-bar">
+            <div class="metrics-title">📊 Objectius de Servei (KPIs) - Gestió de Reclamacions HotCream</div>
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value">&lt;2h</div>
+                    <div class="metric-label">Temps de primera resposta</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">24h</div>
+                    <div class="metric-label">Resolució casos estàndard</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">48h</div>
+                    <div class="metric-label">Resolució casos complexos</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">85%</div>
+                    <div class="metric-label">Resolució al primer contacte (FCR)</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">&gt;4.2</div>
+                    <div class="metric-label">CSAT post-reclamació (1-5)</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">&lt;5%</div>
+                    <div class="metric-label">Escalacions a mediació externa</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend-section">
+            <div class="legend-title">📋 Llegenda del Procés</div>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #2e7d32;"></div>
+                    <div>
+                        <strong>Fase 1 - Recepció</strong><br>
+                        Captura i registre inicial de la reclamació
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #e65100;"></div>
+                    <div>
+                        <strong>Fase 2 - Anàlisi</strong><br>
+                        Investigació i validació de la reclamació
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #1565c0;"></div>
+                    <div>
+                        <strong>Fase 3 - Proposta</strong><br>
+                        Definició i comunicació de la solució
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #6a1b9a;"></div>
+                    <div>
+                        <strong>Fase 4 - Execució</strong><br>
+                        Aplicació de la compensació i tancament
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #c62828;"></div>
+                    <div>
+                        <strong>Fase 5 - Escalació</strong><br>
+                        Casos especials, renegociació o via legal
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff9800; border: 3px solid #e65100;"></div>
+                    <div>
+                        <strong>Punts de decisió</strong><br>
+                        Bifurcacions del flux segons resultat
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
